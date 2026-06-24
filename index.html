@@ -187,7 +187,12 @@
       font-weight: 500;
       color: #14496e;
     }
+    
+    /* ============================================================
+       🚫 DATA PREVIEW - HIDDEN FROM STAFF
+       ============================================================ */
     #dataDisplay {
+      display: none;  /* ← HIDDEN by default */
       margin-top: 1.8rem;
       background: #f2f8ff;
       padding: 1.2rem 1.5rem;
@@ -202,6 +207,12 @@
     #dataDisplay strong {
       color: #0b3d62;
     }
+
+    /* Admin can still see it by adding ?debug=1 to URL */
+    .debug-mode #dataDisplay {
+      display: block !important;
+    }
+
     .footer-actions {
       display: flex;
       flex-wrap: wrap;
@@ -285,7 +296,9 @@
   <div id="successMessage" class="success-message">✅ Data submitted successfully! You will receive an email confirmation.</div>
   <div id="errorMessage" class="error-message">❌ Failed to submit data. Please check your internet connection and try again.</div>
 
-  <!-- collected data preview -->
+  <!-- ============================================================
+       🚫 DATA PREVIEW - HIDDEN from staff (only visible with ?debug=1)
+       ============================================================ -->
   <div id="dataDisplay">
     <strong>📄 collected data</strong> will appear here (JSON format)
   </div>
@@ -316,6 +329,14 @@
     const successMsg = document.getElementById('successMessage');
     const errorMsg = document.getElementById('errorMessage');
 
+    // ----- CHECK FOR DEBUG MODE (for admin) -----
+    // Add ?debug=1 to URL to show the data preview
+    const urlParams = new URLSearchParams(window.location.search);
+    const isDebugMode = urlParams.get('debug') === '1';
+    if (isDebugMode) {
+      document.querySelector('.card').classList.add('debug-mode');
+    }
+
     // helpers
     function generateSerial(index) {
       return String(index + 1).padStart(3, '0');
@@ -345,11 +366,13 @@
           <td>
             <select class="field-education">
               <option value="">—</option>
+              <option value="DIGREE" ${row.education === 'DIGREE' ? 'selected' : ''}>DIGREE</option>
               <option value="DIPLOMA" ${row.education === 'DIPLOMA' ? 'selected' : ''}>DIPLOMA</option>
-              <option value="BACHELOR" ${row.education === 'BACHELOR' ? 'selected' : ''}>BACHELOR</option>
               <option value="MASTER" ${row.education === 'MASTER' ? 'selected' : ''}>MASTER</option>
               <option value="PHD" ${row.education === 'PHD' ? 'selected' : ''}>PHD</option>
-              <option value="CERTIFICATE" ${row.education === 'CERTIFICATE' ? 'selected' : ''}>CERTIFICATE</option>
+              <option value="FORM IV" ${row.education === 'FORM IV' ? 'selected' : ''}>FORM IV</option>
+              <option value="FORM VI" ${row.education === 'FORM VI' ? 'selected' : ''}>FORM VI</option>
+              <option value="STANDARD VII" ${row.education === 'STANDARD VII' ? 'selected' : ''}>STANDARD VII</option>
             </select>
           </td>
           <td><input type="text" class="field-subject" value="${escapeHtml(row.subject || '')}" placeholder="Subject"></td>
@@ -361,7 +384,18 @@
             </select>
           </td>
           <td>
-            <input type="text" class="field-profession" value="${escapeHtml(row.profession || '')}" placeholder="e.g. Accountant" ${isTeaching ? 'disabled style="background:#f1f5f9;"' : ''}>
+            <select class="field-profession" ${isTeaching ? 'disabled style="background:#f1f5f9;"' : ''}>
+              <option value="">—</option>
+              <option value="ACCOUNTANT AND FINANCE" ${row.profession === 'ACCOUNTANT AND FINANCE' ? 'selected' : ''}>ACCOUNTANT AND FINANCE</option>
+              <option value="ADMINISTRATION" ${row.profession === 'ADMINISTRATION' ? 'selected' : ''}>ADMINISTRATION</option>
+              <option value="CLEANER" ${row.profession === 'CLEANER' ? 'selected' : ''}>CLEANER</option>
+              <option value="COOK" ${row.profession === 'COOK' ? 'selected' : ''}>COOK</option>
+              <option value="GARDENER" ${row.profession === 'GARDENER' ? 'selected' : ''}>GARDENER</option>
+              <option value="MATRON" ${row.profession === 'MATRON' ? 'selected' : ''}>MATRON</option>
+              <option value="SCHOOL MANAGER" ${row.profession === 'SCHOOL MANAGER' ? 'selected' : ''}>SCHOOL MANAGER</option>
+              <option value="SECURITY" ${row.profession === 'SECURITY' ? 'selected' : ''}>SECURITY</option>
+              <option value="STORE KEEPER" ${row.profession === 'STORE KEEPER' ? 'selected' : ''}>STORE KEEPER</option>
+            </select>
           </td>
           <td class="action-cell">
             <button class="btn-icon danger" data-action="delete" title="Delete row">✕</button>
@@ -444,7 +478,7 @@
       return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
-    // collect data (JSON)
+    // collect data (JSON) - hidden from staff unless debug mode
     function collectData() {
       document.querySelectorAll('#tableBody tr').forEach(tr => updateRowFromDOM(tr));
 
@@ -463,7 +497,10 @@
       });
 
       const json = JSON.stringify(clean, null, 2);
-      dataDisplay.innerHTML = `<strong>📄 collected data (${clean.length} entries)</strong>\n${json}`;
+      // Only update display if in debug mode
+      if (isDebugMode) {
+        dataDisplay.innerHTML = `<strong>📄 collected data (${clean.length} entries)</strong>\n${json}`;
+      }
       return clean;
     }
 
