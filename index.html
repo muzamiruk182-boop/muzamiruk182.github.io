@@ -278,6 +278,10 @@
       color: #6b8ba8;
       font-style: italic;
     }
+    .already-registered {
+      color: #27ae60;
+      font-weight: 600;
+    }
     @media (max-width: 600px) {
       .card { padding: 0.8rem; }
       h1 { font-size: 1.3rem; }
@@ -333,6 +337,7 @@
     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
       <button class="btn btn-primary" id="addRowBtn">➕ Add row</button>
       <button class="btn btn-outline" id="resetDefaultBtn">↺ Reset</button>
+      <button class="btn btn-outline" id="clearFormBtn" style="color:#c0392b; border-color:#c0392b;">🗑️ Clear Form</button>
     </div>
     <div class="footer-actions">
       <button class="btn btn-success" id="collectDataBtn">📋 Collect</button>
@@ -385,20 +390,21 @@
     // ============================================================
     const FORMSPREE_URL = 'https://formspree.io/f/mqeveqvz';
     const STORAGE_KEY = 'staff_submitted_data';
+    const FORM_STORAGE_KEY = 'staff_form_data';
 
     // ----- DEFAULT SAMPLE DATA (pre-saved in submitted list) -----
     const defaultSubmittedData = [
       { 
         data: { serial: '001', fullName: 'SIRIAKUS JUSTINIAN IBRAHIM', sex: 'MALE', telephone: '255755046557', education: 'DIPLOMA', subject: 'Mathematics', staffType: 'Teaching', profession: '' },
-        timestamp: new Date(Date.now() - 86400000 * 2).toISOString() // 2 days ago
+        timestamp: new Date(Date.now() - 86400000 * 2).toISOString()
       },
       { 
         data: { serial: '002', fullName: 'MUZAMIRU DAUDA KAMUGISHA', sex: 'MALE', telephone: '255683924994', education: 'DIPLOMA', subject: 'Science', staffType: 'Teaching', profession: '' },
-        timestamp: new Date(Date.now() - 86400000).toISOString() // 1 day ago
+        timestamp: new Date(Date.now() - 86400000).toISOString()
       },
       { 
         data: { serial: '003', fullName: 'ELLY NYAUKE', sex: 'MALE', telephone: '255659956837', education: 'DIPLOMA', subject: 'English and Maths', staffType: 'Teaching', profession: '' },
-        timestamp: new Date(Date.now() - 3600000 * 2).toISOString() // 2 hours ago
+        timestamp: new Date(Date.now() - 3600000 * 2).toISOString()
       }
     ];
 
@@ -422,6 +428,7 @@
     const submittedBody = document.getElementById('submittedBody');
     const submittedCount = document.getElementById('submittedCount');
     const clearSubmittedBtn = document.getElementById('clearSubmittedBtn');
+    const clearFormBtn = document.getElementById('clearFormBtn');
 
     // ============================================================
     // LOCAL STORAGE – load / save submitted data
@@ -438,7 +445,6 @@
         }
       } catch (e) { /* ignore */ }
       
-      // If no data in storage, seed with default data
       submittedData = JSON.parse(JSON.stringify(defaultSubmittedData));
       saveSubmittedToStorage();
     }
@@ -447,6 +453,28 @@
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(submittedData));
       } catch (e) { /* ignore */ }
+    }
+
+    // ============================================================
+    // FORM DATA – save / load from localStorage
+    // ============================================================
+    function saveFormToStorage() {
+      try {
+        localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(rows));
+      } catch (e) { /* ignore */ }
+    }
+
+    function loadFormFromStorage() {
+      try {
+        const stored = localStorage.getItem(FORM_STORAGE_KEY);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        }
+      } catch (e) { /* ignore */ }
+      return null;
     }
 
     // ============================================================
@@ -463,12 +491,10 @@
       }
 
       let html = '';
-      // Show newest first
       const sorted = [...submittedData].reverse();
       sorted.forEach((record, idx) => {
         const s = record.data || {};
         const time = record.timestamp ? new Date(record.timestamp).toLocaleString() : '—';
-        const isRegistered = s.fullName && s.fullName.trim() !== '';
         html += `<tr>
           <td style="text-align:center;">${idx + 1}</td>
           <td><strong>${escapeHtml(s.fullName || '')}</strong></td>
@@ -540,6 +566,7 @@
           <td>
             <select class="field-education">
               <option value="">—</option>
+              <option value="CERTIFICATE" ${row.education === 'CERTIFICATE' ? 'selected' : ''}>CERTIFICATE</option>
               <option value="DIGREE" ${row.education === 'DIGREE' ? 'selected' : ''}>DIGREE</option>
               <option value="DIPLOMA" ${row.education === 'DIPLOMA' ? 'selected' : ''}>DIPLOMA</option>
               <option value="MASTER" ${row.education === 'MASTER' ? 'selected' : ''}>MASTER</option>
@@ -588,13 +615,20 @@
             if (rows.length <= 1) { alert('At least one row is required.'); return; }
             rows.splice(index, 1);
             renderTable();
+            saveFormToStorage();
           });
         }
 
         const inputs = tr.querySelectorAll('input, select');
         inputs.forEach(input => {
-          input.addEventListener('change', () => updateRowFromDOM(tr));
-          input.addEventListener('input', () => updateRowFromDOM(tr));
+          input.addEventListener('change', () => {
+            updateRowFromDOM(tr);
+            saveFormToStorage();
+          });
+          input.addEventListener('input', () => {
+            updateRowFromDOM(tr);
+            saveFormToStorage();
+          });
         });
 
         const staffTypeSelect = tr.querySelector('.field-staffType');
@@ -611,6 +645,7 @@
               professionInput.style.background = 'white';
             }
             updateRowFromDOM(tr);
+            saveFormToStorage();
           });
         }
       });
@@ -638,7 +673,7 @@
     }
 
     // ============================================================
-    // SUBMIT DATA
+    // SUBMIT DATA - FORM IS NOT EMPTIED!
     // ============================================================
     async function submitData() {
       successMsg.style.display = 'none';
@@ -650,10 +685,9 @@
       if (!hasData) { alert('Please fill in at least one staff name.'); return; }
 
       try {
-        // Save each row to submitted data
+        let newRegistrations = 0;
         data.forEach(record => {
           if (record.fullName.trim()) {
-            // Check if already registered (avoid duplicates)
             const exists = submittedData.some(sub => 
               sub.data.fullName === record.fullName && 
               sub.data.telephone === record.telephone
@@ -663,9 +697,11 @@
                 data: { ...record },
                 timestamp: new Date().toISOString()
               });
+              newRegistrations++;
             }
           }
         });
+        
         saveSubmittedToStorage();
         renderSubmittedTable();
 
@@ -676,11 +712,13 @@
           body: JSON.stringify({
             staffData: data,
             totalEntries: data.length,
+            newRegistrations: newRegistrations,
             submittedAt: new Date().toISOString()
           })
         });
 
         if (response.ok) {
+          successMsg.textContent = `✅ ${newRegistrations} new staff registered successfully! Form data kept for your use.`;
           successMsg.style.display = 'block';
           setTimeout(() => { successMsg.style.display = 'none'; }, 10000);
         } else {
@@ -694,10 +732,21 @@
     }
 
     // ============================================================
+    // CLEAR FORM ONLY (without affecting submitted data)
+    // ============================================================
+    function clearFormOnly() {
+      if (confirm('Clear the entry form? This will NOT delete registered staff data.')) {
+        rows = defaultRows.map(r => ({ ...r }));
+        renderTable();
+        saveFormToStorage();
+      }
+    }
+
+    // ============================================================
     // CLEAR SUBMITTED DATA
     // ============================================================
     function clearSubmitted() {
-      if (confirm('Delete all submitted records from this device?')) {
+      if (confirm('Delete ALL registered staff records from this device?')) {
         submittedData = [];
         saveSubmittedToStorage();
         renderSubmittedTable();
@@ -708,13 +757,17 @@
     // RESET / ADD ROW
     // ============================================================
     function resetToDefault() {
-      rows = defaultRows.map(r => ({ ...r }));
-      renderTable();
+      if (confirm('Reset to default sample data? This will clear your current form entries.')) {
+        rows = defaultRows.map(r => ({ ...r }));
+        renderTable();
+        saveFormToStorage();
+      }
     }
 
     function addRow() {
       rows.push({ serial: '', fullName: '', sex: '', telephone: '', education: '', subject: '', staffType: '', profession: '' });
       renderTable();
+      saveFormToStorage();
       const lastTr = tbody.lastElementChild;
       if (lastTr) lastTr.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
@@ -723,20 +776,26 @@
     // INIT
     // ============================================================
     function init() {
-      // Load submitted data from localStorage (seeds with default if empty)
+      // Load submitted data from localStorage
       loadSubmittedFromStorage();
       renderSubmittedTable();
 
-      // Set default rows (empty form)
-      rows = defaultRows.map(r => ({ ...r }));
+      // Load form data from localStorage, or use defaults
+      const savedForm = loadFormFromStorage();
+      if (savedForm) {
+        rows = savedForm;
+      } else {
+        rows = defaultRows.map(r => ({ ...r }));
+      }
       renderTable();
 
       // Event listeners
       document.getElementById('addRowBtn').addEventListener('click', addRow);
       document.getElementById('resetDefaultBtn').addEventListener('click', resetToDefault);
+      document.getElementById('clearFormBtn').addEventListener('click', clearFormOnly);
       document.getElementById('collectDataBtn').addEventListener('click', () => { 
         collectData(); 
-        alert('Data collected. Click "Submit All" to save and send.');
+        alert('Data collected. Click "Submit All" to register and send.');
       });
       document.getElementById('submitDataBtn').addEventListener('click', submitData);
       clearSubmittedBtn.addEventListener('click', clearSubmitted);
