@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
   <title>Staff Registration</title>
   <style>
+    /* ----- RESET & BASE ----- */
     * {
       box-sizing: border-box;
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -16,62 +17,67 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 1.5rem;
+      padding: 1rem;
     }
     .card {
-      max-width: 1100px;
+      max-width: 1200px;
       width: 100%;
       background: white;
       border-radius: 28px;
       box-shadow: 0 20px 40px -12px rgba(0,20,40,0.25);
-      padding: 2rem 2rem 2.5rem;
+      padding: 1.5rem 1.5rem 2rem;
       transition: 0.2s;
     }
     h1 {
       font-weight: 600;
-      font-size: 1.9rem;
+      font-size: 1.6rem;
       letter-spacing: -0.3px;
       color: #0b2b4a;
-      margin: 0 0 0.25rem 0;
+      margin: 0 0 0.2rem 0;
       display: flex;
       align-items: center;
+      flex-wrap: wrap;
       gap: 8px;
     }
     .subhead {
       color: #2c5778;
       font-weight: 400;
-      font-size: 1rem;
-      margin: 0 0 1.8rem 0;
+      font-size: 0.95rem;
+      margin: 0 0 1.5rem 0;
       border-left: 4px solid #2a7de1;
       padding-left: 1rem;
       background: #eef5fc;
       border-radius: 0 20px 20px 0;
       line-height: 1.4;
+      padding: 0.5rem 1rem;
     }
+    /* ----- TABLE WRAPPER (scroll on small screens) ----- */
     .table-wrap {
       overflow-x: auto;
       border-radius: 18px;
       border: 1px solid #e2eaf2;
       background: #ffffff;
-      margin-bottom: 2rem;
+      margin-bottom: 1.8rem;
+      -webkit-overflow-scrolling: touch;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.9rem;
-      min-width: 720px;
+      font-size: 0.85rem;
+      min-width: 700px; /* ensures all columns visible when scrolling */
     }
     th {
       background: #eaf1fa;
       color: #1a405c;
       font-weight: 600;
-      padding: 0.9rem 0.6rem;
+      padding: 0.7rem 0.4rem;
       text-align: center;
       border-bottom: 2px solid #cbdae7;
       white-space: nowrap;
+      font-size: 0.8rem;
     }
     td {
-      padding: 0.4rem 0.4rem;
+      padding: 0.3rem 0.3rem;
       border-bottom: 1px solid #dee8f0;
       vertical-align: middle;
     }
@@ -79,17 +85,20 @@
       text-align: center;
       font-weight: 500;
       color: #1d4b6e;
-      width: 70px;
+      width: 55px;
+      min-width: 55px;
     }
+    /* form elements inside table */
     input, select {
       width: 100%;
-      padding: 0.45rem 0.4rem;
+      padding: 0.4rem 0.3rem;
       border: 1px solid #ccdae8;
-      border-radius: 10px;
-      font-size: 0.85rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
       background: #fafcff;
       transition: 0.15s;
       box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+      min-width: 60px;
     }
     input:focus, select:focus {
       border-color: #2a7de1;
@@ -98,18 +107,19 @@
       box-shadow: 0 0 0 3px rgba(42, 125, 225, 0.2);
     }
     .staff-type-select {
-      min-width: 100px;
+      min-width: 90px;
     }
     .action-cell {
       text-align: center;
       white-space: nowrap;
+      width: 45px;
     }
     .btn-icon {
       background: transparent;
       border: none;
-      font-size: 1.1rem;
+      font-size: 1rem;
       cursor: pointer;
-      padding: 0.2rem 0.6rem;
+      padding: 0.2rem 0.4rem;
       border-radius: 30px;
       transition: 0.1s;
       color: #3b6e96;
@@ -122,28 +132,30 @@
       background: #ffe6e6;
       color: #b33c3c;
     }
+    /* ----- BUTTONS & TOOLBAR ----- */
     .toolbar {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 1rem;
-      margin: 1.2rem 0 0.2rem;
+      gap: 0.8rem;
+      margin: 1rem 0 0.2rem;
     }
     .btn {
       background: white;
       border: 1px solid #c7d8e9;
-      padding: 0.6rem 1.3rem;
+      padding: 0.5rem 1rem;
       border-radius: 60px;
       font-weight: 500;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: #1f4a6e;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       transition: 0.15s;
       box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      white-space: nowrap;
     }
     .btn-primary {
       background: #1f5f96;
@@ -183,81 +195,116 @@
       background: #e5eff9;
       padding: 0.15rem 0.9rem;
       border-radius: 30px;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 500;
       color: #14496e;
     }
-    
-    /* ============================================================
-       🚫 DATA PREVIEW - HIDDEN FROM STAFF
-       ============================================================ */
-    #dataDisplay {
-      display: none;  /* ← HIDDEN by default */
-      margin-top: 1.8rem;
-      background: #f2f8ff;
-      padding: 1.2rem 1.5rem;
-      border-radius: 20px;
-      border: 1px solid #d6e4f2;
-      font-size: 0.82rem;
-      white-space: pre-wrap;
-      word-break: break-word;
-      max-height: 180px;
-      overflow-y: auto;
-    }
-    #dataDisplay strong {
-      color: #0b3d62;
-    }
-
-    /* Admin can still see it by adding ?debug=1 to URL */
-    .debug-mode #dataDisplay {
-      display: block !important;
-    }
-
     .footer-actions {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 0.8rem;
+      gap: 0.6rem;
     }
     .copy-hint {
       color: #2b6c9c;
-      font-size: 0.8rem;
-      margin-left: 0.4rem;
+      font-size: 0.75rem;
+      margin-left: 0.2rem;
+    }
+    /* ----- MESSAGES ----- */
+    .success-message, .error-message {
+      padding: 0.6rem 1rem;
+      border-radius: 12px;
+      margin-top: 0.8rem;
+      display: none;
+      font-size: 0.9rem;
     }
     .success-message {
       background: #d4edda;
       color: #155724;
-      padding: 0.8rem 1.2rem;
-      border-radius: 12px;
       border: 1px solid #c3e6cb;
-      margin-top: 1rem;
-      display: none;
     }
     .error-message {
       background: #f8d7da;
       color: #721c24;
-      padding: 0.8rem 1.2rem;
-      border-radius: 12px;
       border: 1px solid #f5c6cb;
-      margin-top: 1rem;
-      display: none;
     }
+    /* ----- SUBMITTED DATA SECTION (shows who filled) ----- */
+    .submitted-section {
+      margin-top: 2rem;
+      border-top: 2px dashed #d0dce8;
+      padding-top: 1.5rem;
+    }
+    .submitted-section h2 {
+      font-size: 1.1rem;
+      color: #0b2b4a;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 0 0 0.8rem 0;
+    }
+    .submitted-section h2 small {
+      font-weight: 400;
+      font-size: 0.8rem;
+      color: #4b6f8e;
+    }
+    .submitted-table-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid #e2eaf2;
+      background: #fafdff;
+      -webkit-overflow-scrolling: touch;
+    }
+    .submitted-table-wrap table {
+      min-width: 700px;
+      font-size: 0.82rem;
+    }
+    .submitted-table-wrap th {
+      background: #dce6f2;
+      color: #1a3a55;
+      padding: 0.5rem 0.4rem;
+      font-size: 0.75rem;
+    }
+    .submitted-table-wrap td {
+      padding: 0.4rem 0.4rem;
+      color: #1f3d5a;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 1.5rem 0.5rem;
+      color: #6b8ba8;
+      font-style: italic;
+    }
+    /* ----- RESPONSIVE TWEAKS ----- */
     @media (max-width: 600px) {
-      .card { padding: 1.2rem; }
-      th, td { padding: 0.3rem 0.2rem; }
+      .card { padding: 0.8rem; }
+      h1 { font-size: 1.3rem; }
+      .subhead { font-size: 0.8rem; padding: 0.3rem 0.8rem; }
+      th, td { padding: 0.2rem 0.2rem; }
+      input, select { font-size: 0.75rem; padding: 0.3rem 0.2rem; }
+      .btn { font-size: 0.75rem; padding: 0.4rem 0.7rem; }
+      .serial-col { width: 40px; min-width: 40px; }
+      .action-cell { width: 35px; }
+      .submitted-section h2 { font-size: 1rem; }
+    }
+    @media (max-width: 480px) {
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .footer-actions { justify-content: center; }
+      .btn { justify-content: center; }
     }
   </style>
 </head>
 <body>
 <div class="card">
+  <!-- HEADER -->
   <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;">
     <h1>🧑‍🏫 Staff register</h1>
     <span class="badge">teaching · non-teaching</span>
   </div>
   <div class="subhead">
-    Serial No. · Full Name · Sex · Telephone · Education · Subject · Staff Type · Profession (non‑teaching)
+    Serial · Full Name · Sex · Telephone · Education · Subject · Staff Type · Profession (non‑teaching)
   </div>
 
+  <!-- ENTRY TABLE -->
   <div class="table-wrap">
     <table id="staffTable">
       <thead>
@@ -267,51 +314,76 @@
           <th>Sex</th>
           <th>Telephone</th>
           <th>Education</th>
-          <th>Teaching Subject</th>
+          <th>Subject</th>
           <th>Staff Type</th>
           <th>Profession <span style="font-weight:400;">(non‑teaching)</span></th>
-          <th style="width:50px;">⚙️</th>
+          <th style="width:40px;">⚙️</th>
         </tr>
       </thead>
       <tbody id="tableBody">
-        <!-- rows will be rendered by js -->
+        <!-- rows rendered by js -->
       </tbody>
     </table>
   </div>
 
-  <!-- toolbar -->
+  <!-- TOOLBAR -->
   <div class="toolbar">
-    <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
       <button class="btn btn-primary" id="addRowBtn">➕ Add row</button>
-      <button class="btn btn-outline" id="resetDefaultBtn">↺ Reset sample</button>
+      <button class="btn btn-outline" id="resetDefaultBtn">↺ Reset</button>
     </div>
     <div class="footer-actions">
-      <button class="btn btn-success" id="collectDataBtn">📋 Collect Data</button>
-      <button class="btn btn-danger" id="submitDataBtn">📤 Submit All Data</button>
+      <button class="btn btn-success" id="collectDataBtn">📋 Collect</button>
+      <button class="btn btn-danger" id="submitDataBtn">📤 Submit All</button>
       <span class="copy-hint" id="rowCountDisplay">0 entries</span>
     </div>
   </div>
 
-  <!-- Success/Error messages -->
-  <div id="successMessage" class="success-message">✅ Data submitted successfully! You will receive an email confirmation.</div>
-  <div id="errorMessage" class="error-message">❌ Failed to submit data. Please check your internet connection and try again.</div>
+  <!-- MESSAGES -->
+  <div id="successMessage" class="success-message">✅ Data submitted successfully! You will receive an email.</div>
+  <div id="errorMessage" class="error-message">❌ Submission failed. Check your connection and try again.</div>
 
   <!-- ============================================================
-       🚫 DATA PREVIEW - HIDDEN from staff (only visible with ?debug=1)
+       SUBMITTED DATA SECTION – shows who already filled
        ============================================================ -->
-  <div id="dataDisplay">
-    <strong>📄 collected data</strong> will appear here (JSON format)
+  <div class="submitted-section" id="submittedSection">
+    <h2>
+      📋 Submitted data 
+      <small id="submittedCount">(0 entries)</small>
+      <button class="btn btn-outline" id="clearSubmittedBtn" style="font-size:0.7rem; padding:0.2rem 0.6rem; margin-left:auto;">Clear all</button>
+    </h2>
+    <div class="submitted-table-wrap">
+      <table id="submittedTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Full Name</th>
+            <th>Sex</th>
+            <th>Telephone</th>
+            <th>Education</th>
+            <th>Subject</th>
+            <th>Staff Type</th>
+            <th>Profession</th>
+            <th>Submitted at</th>
+          </tr>
+        </thead>
+        <tbody id="submittedBody">
+          <tr><td colspan="9" class="empty-state">No submissions yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
 <script>
   (function() {
     // ============================================================
-    // ✅ YOUR FORMSPREE URL - ALREADY CONFIGURED
+    // CONFIGURATION
     // ============================================================
     const FORMSPREE_URL = 'https://formspree.io/f/mqeveqvz';
-    
-    // ----- default sample data (matching the requested list) -----
+    const STORAGE_KEY = 'staff_submitted_data';
+
+    // ----- DEFAULT SAMPLE ROWS (for the entry form) -----
     const defaultRows = [
       { serial: '001', fullName: 'SIRIAKUS JUSTINIAN IBRAHIM', sex: 'MALE', telephone: '255755046557', education: 'DIPLOMA', subject: 'Mathematics', staffType: 'Teaching', profession: '' },
       { serial: '002', fullName: 'MUZAMIRU DAUDA KAMUGISHA', sex: 'MALE', telephone: '255683924994', education: 'DIPLOMA', subject: 'Science', staffType: 'Teaching', profession: '' },
@@ -319,34 +391,114 @@
       { serial: '004', fullName: '', sex: '', telephone: '', education: '', subject: '', staffType: '', profession: '' }
     ];
 
-    // ----- state -----
-    let rows = [];
+    // ----- STATE -----
+    let rows = [];                // current entry form rows
+    let submittedData = [];       // array of submitted records (with timestamp)
 
-    // DOM refs
+    // ----- DOM REFS -----
     const tbody = document.getElementById('tableBody');
-    const dataDisplay = document.getElementById('dataDisplay');
     const rowCountSpan = document.getElementById('rowCountDisplay');
     const successMsg = document.getElementById('successMessage');
     const errorMsg = document.getElementById('errorMessage');
+    const submittedBody = document.getElementById('submittedBody');
+    const submittedCount = document.getElementById('submittedCount');
+    const clearSubmittedBtn = document.getElementById('clearSubmittedBtn');
 
-    // ----- CHECK FOR DEBUG MODE (for admin) -----
-    // Add ?debug=1 to URL to show the data preview
-    const urlParams = new URLSearchParams(window.location.search);
-    const isDebugMode = urlParams.get('debug') === '1';
-    if (isDebugMode) {
-      document.querySelector('.card').classList.add('debug-mode');
+    // ============================================================
+    // LOCAL STORAGE – load / save submitted data
+    // ============================================================
+    function loadSubmittedFromStorage() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          submittedData = JSON.parse(stored);
+          if (!Array.isArray(submittedData)) submittedData = [];
+        } else {
+          submittedData = [];
+        }
+      } catch (e) {
+        submittedData = [];
+      }
+      renderSubmittedTable();
     }
 
-    // helpers
+    function saveSubmittedToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(submittedData));
+      } catch (e) { /* ignore */ }
+    }
+
+    // ============================================================
+    // RENDER SUBMITTED TABLE (shows who already filled)
+    // ============================================================
+    function renderSubmittedTable() {
+      if (!submittedBody) return;
+      const count = submittedData.length;
+      submittedCount.textContent = `(${count} entry${count !== 1 ? 's' : ''})`;
+
+      if (count === 0) {
+        submittedBody.innerHTML = `<tr><td colspan="9" class="empty-state">No submissions yet.</td></tr>`;
+        return;
+      }
+
+      let html = '';
+      // show newest first
+      const sorted = [...submittedData].reverse();
+      sorted.forEach((record, idx) => {
+        const s = record.data || {};
+        const time = record.timestamp ? new Date(record.timestamp).toLocaleString() : '—';
+        html += `<tr>
+          <td style="text-align:center;">${idx + 1}</td>
+          <td>${escapeHtml(s.fullName || '')}</td>
+          <td>${escapeHtml(s.sex || '')}</td>
+          <td>${escapeHtml(s.telephone || '')}</td>
+          <td>${escapeHtml(s.education || '')}</td>
+          <td>${escapeHtml(s.subject || '')}</td>
+          <td>${escapeHtml(s.staffType || '')}</td>
+          <td>${escapeHtml(s.profession || '')}</td>
+          <td style="font-size:0.7rem; color:#4a6f8e;">${escapeHtml(time)}</td>
+        </tr>`;
+      });
+      submittedBody.innerHTML = html;
+    }
+
+    // ============================================================
+    // ENTRY FORM – render / update
+    // ============================================================
     function generateSerial(index) {
       return String(index + 1).padStart(3, '0');
     }
 
-    // render table from rows array
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function updateRowCount() {
+      rowCountSpan.textContent = `${rows.length} entries`;
+    }
+
+    function updateRowFromDOM(tr) {
+      const index = parseInt(tr.dataset.index, 10);
+      if (isNaN(index) || index >= rows.length) return;
+      const row = rows[index];
+      row.fullName = tr.querySelector('.field-fullName')?.value || '';
+      row.sex = tr.querySelector('.field-sex')?.value || '';
+      row.telephone = tr.querySelector('.field-telephone')?.value || '';
+      row.education = tr.querySelector('.field-education')?.value || '';
+      row.subject = tr.querySelector('.field-subject')?.value || '';
+      row.staffType = tr.querySelector('.field-staffType')?.value || '';
+      const profInput = tr.querySelector('.field-profession');
+      if (profInput && !profInput.disabled) {
+        row.profession = profInput.value || '';
+      } else {
+        row.profession = '';
+      }
+    }
+
     function renderTable() {
-      rows.forEach((row, idx) => {
-        row.serial = generateSerial(idx);
-      });
+      // update serials
+      rows.forEach((row, idx) => { row.serial = generateSerial(idx); });
 
       let html = '';
       rows.forEach((row, idx) => {
@@ -405,32 +557,28 @@
       tbody.innerHTML = html;
       updateRowCount();
 
-      // attach events to each row
-      document.querySelectorAll('#tableBody tr').forEach((tr, idx) => {
+      // attach events
+      document.querySelectorAll('#tableBody tr').forEach((tr) => {
+        // delete
         const delBtn = tr.querySelector('[data-action="delete"]');
         if (delBtn) {
           delBtn.addEventListener('click', function(e) {
             e.stopPropagation();
             const index = parseInt(tr.dataset.index, 10);
-            if (rows.length <= 1) {
-              alert('At least one row is required.');
-              return;
-            }
+            if (rows.length <= 1) { alert('At least one row is required.'); return; }
             rows.splice(index, 1);
             renderTable();
           });
         }
 
+        // inputs
         const inputs = tr.querySelectorAll('input, select');
         inputs.forEach(input => {
-          input.addEventListener('change', function() {
-            updateRowFromDOM(tr);
-          });
-          input.addEventListener('input', function() {
-            updateRowFromDOM(tr);
-          });
+          input.addEventListener('change', () => updateRowFromDOM(tr));
+          input.addEventListener('input', () => updateRowFromDOM(tr));
         });
 
+        // staff type → enable/disable profession
         const staffTypeSelect = tr.querySelector('.field-staffType');
         const professionInput = tr.querySelector('.field-profession');
         if (staffTypeSelect && professionInput) {
@@ -450,38 +598,11 @@
       });
     }
 
-    function updateRowFromDOM(tr) {
-      const index = parseInt(tr.dataset.index, 10);
-      if (isNaN(index) || index >= rows.length) return;
-      const row = rows[index];
-      row.fullName = tr.querySelector('.field-fullName')?.value || '';
-      row.sex = tr.querySelector('.field-sex')?.value || '';
-      row.telephone = tr.querySelector('.field-telephone')?.value || '';
-      row.education = tr.querySelector('.field-education')?.value || '';
-      row.subject = tr.querySelector('.field-subject')?.value || '';
-      row.staffType = tr.querySelector('.field-staffType')?.value || '';
-      const profInput = tr.querySelector('.field-profession');
-      if (profInput && !profInput.disabled) {
-        row.profession = profInput.value || '';
-      } else {
-        row.profession = '';
-      }
-    }
-
-    function updateRowCount() {
-      const count = rows.length;
-      rowCountSpan.textContent = `${count} entries`;
-    }
-
-    function escapeHtml(str) {
-      if (!str) return '';
-      return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
-
-    // collect data (JSON) - hidden from staff unless debug mode
+    // ============================================================
+    // COLLECT DATA (from entry form)
+    // ============================================================
     function collectData() {
       document.querySelectorAll('#tableBody tr').forEach(tr => updateRowFromDOM(tr));
-
       const clean = rows.map((row, idx) => {
         const serial = generateSerial(idx);
         return {
@@ -495,44 +616,41 @@
           profession: (row.staffType === 'Non-Teaching') ? (row.profession || '') : ''
         };
       });
-
-      const json = JSON.stringify(clean, null, 2);
-      // Only update display if in debug mode
-      if (isDebugMode) {
-        dataDisplay.innerHTML = `<strong>📄 collected data (${clean.length} entries)</strong>\n${json}`;
-      }
       return clean;
     }
 
-    // ----- SUBMIT DATA TO FORMSPREE -----
+    // ============================================================
+    // SUBMIT DATA → Formspree + save to local storage
+    // ============================================================
     async function submitData() {
-      // Hide any previous messages
       successMsg.style.display = 'none';
       errorMsg.style.display = 'none';
 
-      // Collect data
       const data = collectData();
-      
-      // Check if there's any data to submit
-      if (data.length === 0) {
-        alert('No data to submit. Please add staff entries first.');
-        return;
-      }
-
-      // Check if at least one row has a name (basic validation)
+      if (data.length === 0) { alert('No data to submit.'); return; }
       const hasData = data.some(row => row.fullName.trim() !== '');
-      if (!hasData) {
-        alert('Please fill in at least one staff member\'s name before submitting.');
-        return;
-      }
+      if (!hasData) { alert('Please fill in at least one staff name.'); return; }
 
+      // Save each row as a separate submission (so we can show who filled)
+      // Also send the whole batch to Formspree.
       try {
-        // Send data to Formspree
+        // 1. Save each row to local storage (with timestamp)
+        data.forEach(record => {
+          // only save if it has a name
+          if (record.fullName.trim()) {
+            submittedData.push({
+              data: { ...record },
+              timestamp: new Date().toISOString()
+            });
+          }
+        });
+        saveSubmittedToStorage();
+        renderSubmittedTable();
+
+        // 2. Send to Formspree (batch)
         const response = await fetch(FORMSPREE_URL, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             staffData: data,
             totalEntries: data.length,
@@ -542,59 +660,60 @@
 
         if (response.ok) {
           successMsg.style.display = 'block';
-          // Auto-hide after 10 seconds
-          setTimeout(() => {
-            successMsg.style.display = 'none';
-          }, 10000);
+          setTimeout(() => { successMsg.style.display = 'none'; }, 10000);
         } else {
           errorMsg.style.display = 'block';
-          setTimeout(() => {
-            errorMsg.style.display = 'none';
-          }, 10000);
+          setTimeout(() => { errorMsg.style.display = 'none'; }, 10000);
         }
-      } catch (error) {
+      } catch (err) {
         errorMsg.style.display = 'block';
-        setTimeout(() => {
-          errorMsg.style.display = 'none';
-        }, 10000);
+        setTimeout(() => { errorMsg.style.display = 'none'; }, 10000);
       }
     }
 
-    // reset to default sample
+    // ============================================================
+    // CLEAR SUBMITTED DATA (local storage)
+    // ============================================================
+    function clearSubmitted() {
+      if (confirm('Delete all submitted records from this device?')) {
+        submittedData = [];
+        saveSubmittedToStorage();
+        renderSubmittedTable();
+      }
+    }
+
+    // ============================================================
+    // RESET / ADD ROW
+    // ============================================================
     function resetToDefault() {
       rows = defaultRows.map(r => ({ ...r }));
       renderTable();
-      collectData();
     }
 
-    // add new row
     function addRow() {
-      const newRow = {
-        serial: '',
-        fullName: '',
-        sex: '',
-        telephone: '',
-        education: '',
-        subject: '',
-        staffType: '',
-        profession: ''
-      };
-      rows.push(newRow);
+      rows.push({ serial: '', fullName: '', sex: '', telephone: '', education: '', subject: '', staffType: '', profession: '' });
       renderTable();
       const lastTr = tbody.lastElementChild;
       if (lastTr) lastTr.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    // ----- initialise -----
+    // ============================================================
+    // INIT
+    // ============================================================
     function init() {
-      resetToDefault();
+      // load submitted data from localStorage
+      loadSubmittedFromStorage();
 
+      // set default rows
+      rows = defaultRows.map(r => ({ ...r }));
+      renderTable();
+
+      // event listeners
       document.getElementById('addRowBtn').addEventListener('click', addRow);
       document.getElementById('resetDefaultBtn').addEventListener('click', resetToDefault);
-      document.getElementById('collectDataBtn').addEventListener('click', function() {
-        collectData();
-      });
+      document.getElementById('collectDataBtn').addEventListener('click', () => { collectData(); alert('Data collected. Check the "Submitted data" section below if you have submitted before, or click Submit All to send.'); });
       document.getElementById('submitDataBtn').addEventListener('click', submitData);
+      clearSubmittedBtn.addEventListener('click', clearSubmitted);
     }
 
     init();
