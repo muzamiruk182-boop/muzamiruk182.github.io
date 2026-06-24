@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
   <title>Staff Registration</title>
   <style>
-    /* ----- RESET & BASE ----- */
     * {
       box-sizing: border-box;
       font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
@@ -51,7 +50,6 @@
       line-height: 1.4;
       padding: 0.5rem 1rem;
     }
-    /* ----- TABLE WRAPPER (scroll on small screens) ----- */
     .table-wrap {
       overflow-x: auto;
       border-radius: 18px;
@@ -64,7 +62,7 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 0.85rem;
-      min-width: 700px; /* ensures all columns visible when scrolling */
+      min-width: 700px;
     }
     th {
       background: #eaf1fa;
@@ -88,7 +86,6 @@
       width: 55px;
       min-width: 55px;
     }
-    /* form elements inside table */
     input, select {
       width: 100%;
       padding: 0.4rem 0.3rem;
@@ -132,7 +129,6 @@
       background: #ffe6e6;
       color: #b33c3c;
     }
-    /* ----- BUTTONS & TOOLBAR ----- */
     .toolbar {
       display: flex;
       flex-wrap: wrap;
@@ -210,7 +206,6 @@
       font-size: 0.75rem;
       margin-left: 0.2rem;
     }
-    /* ----- MESSAGES ----- */
     .success-message, .error-message {
       padding: 0.6rem 1rem;
       border-radius: 12px;
@@ -228,7 +223,6 @@
       color: #721c24;
       border: 1px solid #f5c6cb;
     }
-    /* ----- SUBMITTED DATA SECTION (shows who filled) ----- */
     .submitted-section {
       margin-top: 2rem;
       border-top: 2px dashed #d0dce8;
@@ -241,6 +235,7 @@
       align-items: center;
       gap: 0.6rem;
       margin: 0 0 0.8rem 0;
+      flex-wrap: wrap;
     }
     .submitted-section h2 small {
       font-weight: 400;
@@ -268,13 +263,21 @@
       padding: 0.4rem 0.4rem;
       color: #1f3d5a;
     }
+    .submitted-table-wrap .registered-badge {
+      background: #27ae60;
+      color: white;
+      padding: 0.1rem 0.6rem;
+      border-radius: 30px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      display: inline-block;
+    }
     .empty-state {
       text-align: center;
       padding: 1.5rem 0.5rem;
       color: #6b8ba8;
       font-style: italic;
     }
-    /* ----- RESPONSIVE TWEAKS ----- */
     @media (max-width: 600px) {
       .card { padding: 0.8rem; }
       h1 { font-size: 1.3rem; }
@@ -295,7 +298,6 @@
 </head>
 <body>
 <div class="card">
-  <!-- HEADER -->
   <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;">
     <h1>🧑‍🏫 Staff register</h1>
     <span class="badge">teaching · non-teaching</span>
@@ -344,11 +346,11 @@
   <div id="errorMessage" class="error-message">❌ Submission failed. Check your connection and try again.</div>
 
   <!-- ============================================================
-       SUBMITTED DATA SECTION – shows who already filled
+       SUBMITTED DATA SECTION – shows who already registered
        ============================================================ -->
   <div class="submitted-section" id="submittedSection">
     <h2>
-      📋 Submitted data 
+      📋 Registered Staff 
       <small id="submittedCount">(0 entries)</small>
       <button class="btn btn-outline" id="clearSubmittedBtn" style="font-size:0.7rem; padding:0.2rem 0.6rem; margin-left:auto;">Clear all</button>
     </h2>
@@ -364,11 +366,12 @@
             <th>Subject</th>
             <th>Staff Type</th>
             <th>Profession</th>
-            <th>Submitted at</th>
+            <th>Status</th>
+            <th>Registered at</th>
           </tr>
         </thead>
         <tbody id="submittedBody">
-          <tr><td colspan="9" class="empty-state">No submissions yet.</td></tr>
+          <tr><td colspan="10" class="empty-state">No registrations yet.</td></tr>
         </tbody>
       </table>
     </div>
@@ -383,17 +386,33 @@
     const FORMSPREE_URL = 'https://formspree.io/f/mqeveqvz';
     const STORAGE_KEY = 'staff_submitted_data';
 
+    // ----- DEFAULT SAMPLE DATA (pre-saved in submitted list) -----
+    const defaultSubmittedData = [
+      { 
+        data: { serial: '001', fullName: 'SIRIAKUS JUSTINIAN IBRAHIM', sex: 'MALE', telephone: '255755046557', education: 'DIPLOMA', subject: 'Mathematics', staffType: 'Teaching', profession: '' },
+        timestamp: new Date(Date.now() - 86400000 * 2).toISOString() // 2 days ago
+      },
+      { 
+        data: { serial: '002', fullName: 'MUZAMIRU DAUDA KAMUGISHA', sex: 'MALE', telephone: '255683924994', education: 'DIPLOMA', subject: 'Science', staffType: 'Teaching', profession: '' },
+        timestamp: new Date(Date.now() - 86400000).toISOString() // 1 day ago
+      },
+      { 
+        data: { serial: '003', fullName: 'ELLY NYAUKE', sex: 'MALE', telephone: '255659956837', education: 'DIPLOMA', subject: 'English and Maths', staffType: 'Teaching', profession: '' },
+        timestamp: new Date(Date.now() - 3600000 * 2).toISOString() // 2 hours ago
+      }
+    ];
+
     // ----- DEFAULT SAMPLE ROWS (for the entry form) -----
     const defaultRows = [
-      { serial: '001', fullName: 'SIRIAKUS JUSTINIAN IBRAHIM', sex: 'MALE', telephone: '255755046557', education: 'DIPLOMA', subject: 'Mathematics', staffType: 'Teaching', profession: '' },
-      { serial: '002', fullName: 'MUZAMIRU DAUDA KAMUGISHA', sex: 'MALE', telephone: '255683924994', education: 'DIPLOMA', subject: 'Science', staffType: 'Teaching', profession: '' },
-      { serial: '003', fullName: 'ELLY NYAUKE', sex: 'MALE', telephone: '255659956837', education: 'DIPLOMA', subject: 'English and Maths', staffType: 'Teaching', profession: '' },
+      { serial: '001', fullName: '', sex: '', telephone: '', education: '', subject: '', staffType: '', profession: '' },
+      { serial: '002', fullName: '', sex: '', telephone: '', education: '', subject: '', staffType: '', profession: '' },
+      { serial: '003', fullName: '', sex: '', telephone: '', education: '', subject: '', staffType: '', profession: '' },
       { serial: '004', fullName: '', sex: '', telephone: '', education: '', subject: '', staffType: '', profession: '' }
     ];
 
     // ----- STATE -----
-    let rows = [];                // current entry form rows
-    let submittedData = [];       // array of submitted records (with timestamp)
+    let rows = [];
+    let submittedData = [];
 
     // ----- DOM REFS -----
     const tbody = document.getElementById('tableBody');
@@ -411,15 +430,17 @@
       try {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
-          submittedData = JSON.parse(stored);
-          if (!Array.isArray(submittedData)) submittedData = [];
-        } else {
-          submittedData = [];
+          const parsed = JSON.parse(stored);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            submittedData = parsed;
+            return;
+          }
         }
-      } catch (e) {
-        submittedData = [];
-      }
-      renderSubmittedTable();
+      } catch (e) { /* ignore */ }
+      
+      // If no data in storage, seed with default data
+      submittedData = JSON.parse(JSON.stringify(defaultSubmittedData));
+      saveSubmittedToStorage();
     }
 
     function saveSubmittedToStorage() {
@@ -429,33 +450,35 @@
     }
 
     // ============================================================
-    // RENDER SUBMITTED TABLE (shows who already filled)
+    // RENDER SUBMITTED TABLE
     // ============================================================
     function renderSubmittedTable() {
       if (!submittedBody) return;
       const count = submittedData.length;
-      submittedCount.textContent = `(${count} entry${count !== 1 ? 's' : ''})`;
+      submittedCount.textContent = `(${count} staff registered)`;
 
       if (count === 0) {
-        submittedBody.innerHTML = `<tr><td colspan="9" class="empty-state">No submissions yet.</td></tr>`;
+        submittedBody.innerHTML = `<tr><td colspan="10" class="empty-state">No registrations yet.</td></tr>`;
         return;
       }
 
       let html = '';
-      // show newest first
+      // Show newest first
       const sorted = [...submittedData].reverse();
       sorted.forEach((record, idx) => {
         const s = record.data || {};
         const time = record.timestamp ? new Date(record.timestamp).toLocaleString() : '—';
+        const isRegistered = s.fullName && s.fullName.trim() !== '';
         html += `<tr>
           <td style="text-align:center;">${idx + 1}</td>
-          <td>${escapeHtml(s.fullName || '')}</td>
+          <td><strong>${escapeHtml(s.fullName || '')}</strong></td>
           <td>${escapeHtml(s.sex || '')}</td>
           <td>${escapeHtml(s.telephone || '')}</td>
           <td>${escapeHtml(s.education || '')}</td>
           <td>${escapeHtml(s.subject || '')}</td>
           <td>${escapeHtml(s.staffType || '')}</td>
           <td>${escapeHtml(s.profession || '')}</td>
+          <td><span class="registered-badge">✅ Registered</span></td>
           <td style="font-size:0.7rem; color:#4a6f8e;">${escapeHtml(time)}</td>
         </tr>`;
       });
@@ -497,7 +520,6 @@
     }
 
     function renderTable() {
-      // update serials
       rows.forEach((row, idx) => { row.serial = generateSerial(idx); });
 
       let html = '';
@@ -557,9 +579,7 @@
       tbody.innerHTML = html;
       updateRowCount();
 
-      // attach events
       document.querySelectorAll('#tableBody tr').forEach((tr) => {
-        // delete
         const delBtn = tr.querySelector('[data-action="delete"]');
         if (delBtn) {
           delBtn.addEventListener('click', function(e) {
@@ -571,14 +591,12 @@
           });
         }
 
-        // inputs
         const inputs = tr.querySelectorAll('input, select');
         inputs.forEach(input => {
           input.addEventListener('change', () => updateRowFromDOM(tr));
           input.addEventListener('input', () => updateRowFromDOM(tr));
         });
 
-        // staff type → enable/disable profession
         const staffTypeSelect = tr.querySelector('.field-staffType');
         const professionInput = tr.querySelector('.field-profession');
         if (staffTypeSelect && professionInput) {
@@ -599,7 +617,7 @@
     }
 
     // ============================================================
-    // COLLECT DATA (from entry form)
+    // COLLECT DATA
     // ============================================================
     function collectData() {
       document.querySelectorAll('#tableBody tr').forEach(tr => updateRowFromDOM(tr));
@@ -620,7 +638,7 @@
     }
 
     // ============================================================
-    // SUBMIT DATA → Formspree + save to local storage
+    // SUBMIT DATA
     // ============================================================
     async function submitData() {
       successMsg.style.display = 'none';
@@ -631,23 +649,27 @@
       const hasData = data.some(row => row.fullName.trim() !== '');
       if (!hasData) { alert('Please fill in at least one staff name.'); return; }
 
-      // Save each row as a separate submission (so we can show who filled)
-      // Also send the whole batch to Formspree.
       try {
-        // 1. Save each row to local storage (with timestamp)
+        // Save each row to submitted data
         data.forEach(record => {
-          // only save if it has a name
           if (record.fullName.trim()) {
-            submittedData.push({
-              data: { ...record },
-              timestamp: new Date().toISOString()
-            });
+            // Check if already registered (avoid duplicates)
+            const exists = submittedData.some(sub => 
+              sub.data.fullName === record.fullName && 
+              sub.data.telephone === record.telephone
+            );
+            if (!exists) {
+              submittedData.push({
+                data: { ...record },
+                timestamp: new Date().toISOString()
+              });
+            }
           }
         });
         saveSubmittedToStorage();
         renderSubmittedTable();
 
-        // 2. Send to Formspree (batch)
+        // Send to Formspree
         const response = await fetch(FORMSPREE_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -672,7 +694,7 @@
     }
 
     // ============================================================
-    // CLEAR SUBMITTED DATA (local storage)
+    // CLEAR SUBMITTED DATA
     // ============================================================
     function clearSubmitted() {
       if (confirm('Delete all submitted records from this device?')) {
@@ -701,17 +723,21 @@
     // INIT
     // ============================================================
     function init() {
-      // load submitted data from localStorage
+      // Load submitted data from localStorage (seeds with default if empty)
       loadSubmittedFromStorage();
+      renderSubmittedTable();
 
-      // set default rows
+      // Set default rows (empty form)
       rows = defaultRows.map(r => ({ ...r }));
       renderTable();
 
-      // event listeners
+      // Event listeners
       document.getElementById('addRowBtn').addEventListener('click', addRow);
       document.getElementById('resetDefaultBtn').addEventListener('click', resetToDefault);
-      document.getElementById('collectDataBtn').addEventListener('click', () => { collectData(); alert('Data collected. Check the "Submitted data" section below if you have submitted before, or click Submit All to send.'); });
+      document.getElementById('collectDataBtn').addEventListener('click', () => { 
+        collectData(); 
+        alert('Data collected. Click "Submit All" to save and send.');
+      });
       document.getElementById('submitDataBtn').addEventListener('click', submitData);
       clearSubmittedBtn.addEventListener('click', clearSubmitted);
     }
