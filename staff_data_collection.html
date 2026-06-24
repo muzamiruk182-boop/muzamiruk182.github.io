@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff data · simple collection</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    }
+    body {
+      background: #f4f7fc;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+    }
+    .card {
+      max-width: 1100px;
+      width: 100%;
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 20px 40px -12px rgba(0,20,40,0.25);
+      padding: 2rem 2rem 2.5rem;
+      transition: 0.2s;
+    }
+    h1 {
+      font-weight: 600;
+      font-size: 1.9rem;
+      letter-spacing: -0.3px;
+      color: #0b2b4a;
+      margin: 0 0 0.25rem 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .subhead {
+      color: #2c5778;
+      font-weight: 400;
+      font-size: 1rem;
+      margin: 0 0 1.8rem 0;
+      border-left: 4px solid #2a7de1;
+      padding-left: 1rem;
+      background: #eef5fc;
+      border-radius: 0 20px 20px 0;
+      line-height: 1.4;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 18px;
+      border: 1px solid #e2eaf2;
+      background: #ffffff;
+      margin-bottom: 2rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      min-width: 720px;
+    }
+    th {
+      background: #eaf1fa;
+      color: #1a405c;
+      font-weight: 600;
+      padding: 0.9rem 0.6rem;
+      text-align: center;
+      border-bottom: 2px solid #cbdae7;
+      white-space: nowrap;
+    }
+    td {
+      padding: 0.4rem 0.4rem;
+      border-bottom: 1px solid #dee8f0;
+      vertical-align: middle;
+    }
+    .serial-col {
+      text-align: center;
+      font-weight: 500;
+      color: #1d4b6e;
+      width: 70px;
+    }
+    input, select {
+      width: 100%;
+      padding: 0.45rem 0.4rem;
+      border: 1px solid #ccdae8;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      background: #fafcff;
+      transition: 0.15s;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.02);
+    }
+    input:focus, select:focus {
+      border-color: #2a7de1;
+      outline: none;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(42, 125, 225, 0.2);
+    }
+    .staff-type-select {
+      min-width: 100px;
+    }
+    .action-cell {
+      text-align: center;
+      white-space: nowrap;
+    }
+    .btn-icon {
+      background: transparent;
+      border: none;
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 0.2rem 0.6rem;
+      border-radius: 30px;
+      transition: 0.1s;
+      color: #3b6e96;
+    }
+    .btn-icon:hover {
+      background: #e3edf7;
+      color: #0b2b4a;
+    }
+    .btn-icon.danger:hover {
+      background: #ffe6e6;
+      color: #b33c3c;
+    }
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin: 1.2rem 0 0.2rem;
+    }
+    .btn {
+      background: white;
+      border: 1px solid #c7d8e9;
+      padding: 0.6rem 1.3rem;
+      border-radius: 60px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #1f4a6e;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: 0.15s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+    .btn-primary {
+      background: #1f5f96;
+      border: 1px solid #1f5f96;
+      color: white;
+      box-shadow: 0 4px 8px rgba(26, 80, 130, 0.15);
+    }
+    .btn-primary:hover {
+      background: #134a77;
+      border-color: #134a77;
+      transform: scale(0.97);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #c7d8e9;
+    }
+    .btn-outline:hover {
+      background: #eaf1fa;
+    }
+    .btn-success {
+      background: #1f8b5a;
+      border: 1px solid #1f8b5a;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #15734a;
+    }
+    .badge {
+      background: #e5eff9;
+      padding: 0.15rem 0.9rem;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #14496e;
+    }
+    #dataDisplay {
+      margin-top: 1.8rem;
+      background: #f2f8ff;
+      padding: 1.2rem 1.5rem;
+      border-radius: 20px;
+      border: 1px solid #d6e4f2;
+      font-size: 0.82rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 180px;
+      overflow-y: auto;
+    }
+    #dataDisplay strong {
+      color: #0b3d62;
+    }
+    .footer-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .copy-hint {
+      color: #2b6c9c;
+      font-size: 0.8rem;
+      margin-left: 0.4rem;
+    }
+    @media (max-width: 600px) {
+      .card { padding: 1.2rem; }
+      th, td { padding: 0.3rem 0.2rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <div style="display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;">
+    <h1>🧑‍🏫 Staff register</h1>
+    <span class="badge">teaching · non-teaching</span>
+  </div>
+  <div class="subhead">
+    Serial No. · Full Name · Sex · Telephone · Education · Subject · Staff Type · Profession (non‑teaching)
+  </div>
+
+  <div class="table-wrap">
+    <table id="staffTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Full Name</th>
+          <th>Sex</th>
+          <th>Telephone</th>
+          <th>Education</th>
+          <th>Teaching Subject</th>
+          <th>Staff Type</th>
+          <th>Profession <span style="font-weight:400;">(non‑teaching)</span></th>
+          <th style="width:50px;">⚙️</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <!-- rows will be rendered by js -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- toolbar -->
+  <div class="toolbar">
+    <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+      <button class="btn btn-primary" id="addRowBtn">➕ Add row</button>
+      <button class="btn btn-outline" id="resetDefaultBtn">↺ Reset sample</button>
+    </div>
+    <div class="footer-actions">
+      <button class="btn btn-success" id="collectDataBtn">📋 Collect data</button>
+      <span class="copy-hint" id="rowCountDisplay">0 entries</span>
+    </div>
+  </div>
+
+  <!-- collected data preview -->
+  <div id="dataDisplay">
+    <strong>📄 collected data</strong> will appear here (JSON format)
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ----- default sample data (matching the requested list) -----
+    const defaultRows = [
+      { serial: '001', fullName: 'SIRIAKUS JUSTINIAN IBRAHIM', sex: 'MALE', telephone: '255755046557', education: 'DIPLOMA', subject: 'Mathematics', staffType: 'Teaching', profession: '' },
+      { serial: '002', fullName: 'MUZAMIRU DAUDA KAMUGISHA', sex: 'MALE', telephone: '255683924994', education: 'DIPLOMA', subject: 'Science', staffType: 'Teaching', profession: '' },
+      { serial: '003', fullName: 'ELLY NYAUKE', sex: 'MALE', telephone: '255659956837', education: 'DIPLOMA', subject: 'English and Maths', staffType: 'Teaching', profession: '' },
+      { serial: '004', fullName: '', sex: '', telephone: '', education: '', subject: '', staffType: '', profession: '' }
+    ];
+
+    // ----- state -----
+    let rows = [];
+
+    // DOM refs
+    const tbody = document.getElementById('tableBody');
+    const dataDisplay = document.getElementById('dataDisplay');
+    const rowCountSpan = document.getElementById('rowCountDisplay');
+
+    // helpers
+    function generateSerial(index) {
+      return String(index + 1).padStart(3, '0');
+    }
+
+    // render table from rows array
+    function renderTable() {
+      // update serial numbers based on index
+      rows.forEach((row, idx) => {
+        row.serial = generateSerial(idx);
+      });
+
+      let html = '';
+      rows.forEach((row, idx) => {
+        const staffType = row.staffType || '';
+        const isTeaching = (staffType === 'Teaching');
+        html += `<tr data-index="${idx}">
+          <td class="serial-col">${row.serial}</td>
+          <td><input type="text" class="field-fullName" value="${escapeHtml(row.fullName || '')}" placeholder="Full name"></td>
+          <td>
+            <select class="field-sex">
+              <option value="">—</option>
+              <option value="MALE" ${row.sex === 'MALE' ? 'selected' : ''}>MALE</option>
+              <option value="FEMALE" ${row.sex === 'FEMALE' ? 'selected' : ''}>FEMALE</option>
+            </select>
+          </td>
+          <td><input type="text" class="field-telephone" value="${escapeHtml(row.telephone || '')}" placeholder="Tel"></td>
+          <td>
+            <select class="field-education">
+              <option value="">—</option>
+              <option value="DIPLOMA" ${row.education === 'DIPLOMA' ? 'selected' : ''}>DIPLOMA</option>
+              <option value="BACHELOR" ${row.education === 'BACHELOR' ? 'selected' : ''}>BACHELOR</option>
+              <option value="MASTER" ${row.education === 'MASTER' ? 'selected' : ''}>MASTER</option>
+              <option value="PHD" ${row.education === 'PHD' ? 'selected' : ''}>PHD</option>
+              <option value="CERTIFICATE" ${row.education === 'CERTIFICATE' ? 'selected' : ''}>CERTIFICATE</option>
+            </select>
+          </td>
+          <td><input type="text" class="field-subject" value="${escapeHtml(row.subject || '')}" placeholder="Subject"></td>
+          <td>
+            <select class="field-staffType staff-type-select">
+              <option value="">—</option>
+              <option value="Teaching" ${staffType === 'Teaching' ? 'selected' : ''}>Teaching</option>
+              <option value="Non-Teaching" ${staffType === 'Non-Teaching' ? 'selected' : ''}>Non-Teaching</option>
+            </select>
+          </td>
+          <td>
+            <input type="text" class="field-profession" value="${escapeHtml(row.profession || '')}" placeholder="e.g. Accountant" ${isTeaching ? 'disabled style="background:#f1f5f9;"' : ''}>
+          </td>
+          <td class="action-cell">
+            <button class="btn-icon danger" data-action="delete" title="Delete row">✕</button>
+          </td>
+        </tr>`;
+      });
+      tbody.innerHTML = html;
+      updateRowCount();
+
+      // attach events to each row
+      document.querySelectorAll('#tableBody tr').forEach((tr, idx) => {
+        // delete button
+        const delBtn = tr.querySelector('[data-action="delete"]');
+        if (delBtn) {
+          delBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const index = parseInt(tr.dataset.index, 10);
+            if (rows.length <= 1) {
+              alert('At least one row is required.');
+              return;
+            }
+            rows.splice(index, 1);
+            renderTable();
+          });
+        }
+
+        // input/select change: update rows data
+        const inputs = tr.querySelectorAll('input, select');
+        inputs.forEach(input => {
+          input.addEventListener('change', function() {
+            updateRowFromDOM(tr);
+          });
+          input.addEventListener('input', function() {
+            updateRowFromDOM(tr);
+          });
+        });
+
+        // staff type change: enable/disable profession field
+        const staffTypeSelect = tr.querySelector('.field-staffType');
+        const professionInput = tr.querySelector('.field-profession');
+        if (staffTypeSelect && professionInput) {
+          staffTypeSelect.addEventListener('change', function() {
+            const val = this.value;
+            if (val === 'Teaching') {
+              professionInput.disabled = true;
+              professionInput.value = '';
+              professionInput.style.background = '#f1f5f9';
+            } else {
+              professionInput.disabled = false;
+              professionInput.style.background = 'white';
+            }
+            updateRowFromDOM(tr);
+          });
+        }
+      });
+    }
+
+    // update row object from DOM
+    function updateRowFromDOM(tr) {
+      const index = parseInt(tr.dataset.index, 10);
+      if (isNaN(index) || index >= rows.length) return;
+      const row = rows[index];
+      row.fullName = tr.querySelector('.field-fullName')?.value || '';
+      row.sex = tr.querySelector('.field-sex')?.value || '';
+      row.telephone = tr.querySelector('.field-telephone')?.value || '';
+      row.education = tr.querySelector('.field-education')?.value || '';
+      row.subject = tr.querySelector('.field-subject')?.value || '';
+      row.staffType = tr.querySelector('.field-staffType')?.value || '';
+      // profession: only if not disabled
+      const profInput = tr.querySelector('.field-profession');
+      if (profInput && !profInput.disabled) {
+        row.profession = profInput.value || '';
+      } else {
+        row.profession = '';
+      }
+    }
+
+    // update row count badge
+    function updateRowCount() {
+      const count = rows.length;
+      rowCountSpan.textContent = `${count} entries`;
+    }
+
+    // simple escape
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // collect data (JSON)
+    function collectData() {
+      // sync all rows from DOM first
+      document.querySelectorAll('#tableBody tr').forEach(tr => updateRowFromDOM(tr));
+
+      // build clean array
+      const clean = rows.map((row, idx) => {
+        const serial = generateSerial(idx);
+        return {
+          serial: serial,
+          fullName: row.fullName || '',
+          sex: row.sex || '',
+          telephone: row.telephone || '',
+          education: row.education || '',
+          subject: row.subject || '',
+          staffType: row.staffType || '',
+          profession: (row.staffType === 'Non-Teaching') ? (row.profession || '') : ''
+        };
+      });
+
+      const json = JSON.stringify(clean, null, 2);
+      dataDisplay.innerHTML = `<strong>📄 collected data (${clean.length} entries)</strong>\n${json}`;
+      return clean;
+    }
+
+    // reset to default sample
+    function resetToDefault() {
+      rows = defaultRows.map(r => ({ ...r }));
+      renderTable();
+      // update data preview
+      collectData();
+    }
+
+    // add new row
+    function addRow() {
+      const newRow = {
+        serial: '',
+        fullName: '',
+        sex: '',
+        telephone: '',
+        education: '',
+        subject: '',
+        staffType: '',
+        profession: ''
+      };
+      rows.push(newRow);
+      renderTable();
+      // auto scroll to new row
+      const lastTr = tbody.lastElementChild;
+      if (lastTr) lastTr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // ----- initialise -----
+    function init() {
+      resetToDefault();
+
+      // event listeners
+      document.getElementById('addRowBtn').addEventListener('click', addRow);
+      document.getElementById('resetDefaultBtn').addEventListener('click', resetToDefault);
+      document.getElementById('collectDataBtn').addEventListener('click', function() {
+        collectData();
+      });
+
+      // extra: collect on any change? but we keep explicit.
+      // also attach collect on dataDisplay double click? not needed
+    }
+
+    // call init
+    init();
+  })();
+</script>
+</body>
+</html>
